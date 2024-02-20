@@ -66,8 +66,6 @@ class CarController:
         apply_curvature = apply_ford_curvature_limits(actuators.curvature, self.apply_curvature_last, current_curvature, CS.out.vEgoRaw)
       else:
         apply_curvature = 0.
-
-      self.apply_curvature_last = apply_curvature
       
       steeringPressed = CS.out.steeringPressed
       steeringAngleDeg = CS.out.steeringAngleDeg
@@ -77,7 +75,10 @@ class CarController:
         ramp_type = 3
       else:
         ramp_type = 0
-      
+
+
+      self.apply_curvature_last = apply_curvature
+    
       if self.CP.carFingerprint in CANFD_CAR:
         # TODO: extended mode
         mode = 1 if CC.latActive else 0
