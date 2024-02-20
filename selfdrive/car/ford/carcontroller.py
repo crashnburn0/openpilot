@@ -75,9 +75,7 @@ class CarController:
         ramp_type = 3
       else:
         ramp_type = 0
-
-
-      self.apply_curvature_last = apply_curvature
+        self.apply_curvature_last = apply_curvature
     
       if self.CP.carFingerprint in CANFD_CAR:
         # TODO: extended mode
