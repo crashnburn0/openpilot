@@ -169,7 +169,7 @@ class CarController:
       can_sends.append(fordcan.create_lka_msg(self.packer, self.CAN))
 
     ### longitudinal control ###
-    # send acc msg at 50Hz 
+    # send acc msg at 50Hz
     if self.CP.openpilotLongitudinalControl and (self.frame % CarControllerParams.ACC_CONTROL_STEP) == 0:
       # Both gas and accel are in m/s^2, accel is used solely for braking
       accel = clip(actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
