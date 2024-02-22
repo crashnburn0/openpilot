@@ -28,7 +28,6 @@ def hysteresis(current_value, old_value, target, stdDevLow: float, stdDevHigh: f
     result = old_value
   elif current_value <= target - stdDevLow:
     result = 1
-
   elif current_value >= target + stdDevHigh:
     result = 0
 
