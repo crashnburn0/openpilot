@@ -118,7 +118,7 @@ def create_lat_ctl2_msg(packer, CAN: CanBus, mode: int, ramp_type: int, path_off
   return packer.make_can_msg("LateralMotionControl2", CAN.main, values)
 
 
-def create_acc_msg(packer, CAN: CanBus, long_active: bool, gas: float, accel: float, stopping: bool, v_ego_kph: float):
+def create_acc_msg(packer, CAN: CanBus, long_active: bool, gas: float, accel: float, stopping: bool, brake_actuator: bool, precharge_actuator: bool, v_ego_kph: float):
   """
   Creates a CAN message for the Ford ACC Command.
 
@@ -127,17 +127,20 @@ def create_acc_msg(packer, CAN: CanBus, long_active: bool, gas: float, accel: fl
 
   Frequency is 50Hz.
   """
-  decel = accel < 0 and long_active
+  # brake_actuator = gas == -5 and long_active # and accel < -.75  
+  # decel = actuate and long_active
+  # brake_actuator = precharge_actuator = decel
+  gas_pred = clip(accel, -5, 0) if gas == -5 else accel
   values = {
     "AccBrkTot_A_Rq": accel,                          # Brake total accel request: [-20|11.9449] m/s^2
     "Cmbb_B_Enbl": 1 if long_active else 0,           # Enabled: 0=No, 1=Yes
     "AccPrpl_A_Rq": gas,                              # Acceleration request: [-5|5.23] m/s^2
-    "AccPrpl_A_Pred": -5.0,                           # Acceleration request: [-5|5.23] m/s^2
+    "AccPrpl_A_Pred": gas,                            # Acceleration request: [-5|5.23] m/s^2
     "AccResumEnbl_B_Rq": 1 if long_active else 0,
     "AccVeh_V_Trg": v_ego_kph,                        # Target speed: [0|255] km/h
     # TODO: we may be able to improve braking response by utilizing pre-charging better
-    "AccBrkPrchg_B_Rq": 1 if decel else 0,            # Pre-charge brake request: 0=No, 1=Yes
-    "AccBrkDecel_B_Rq": 1 if decel else 0,            # Deceleration request: 0=Inactive, 1=Active
+    "AccBrkPrchg_B_Rq": 1 if precharge_actuator else 0, # Pre-charge brake request: 0=No, 1=Yes
+    "AccBrkDecel_B_Rq": 1 if brake_actuator else 0, # Deceleration request: 0=Inactive, 1=Activective
     "AccStopStat_B_Rq": 1 if stopping else 0,
   }
   return packer.make_can_msg("ACCDATA", CAN.main, values)
@@ -212,7 +215,7 @@ def create_acc_ui_msg(packer, CAN: CanBus, CP, main_on: bool, enabled: bool, fcw
       "AccFllwMde_B_Dsply": 1 if hud_control.leadVisible else 0,  # Lead indicator
       "AccStopMde_B_Dsply": 1 if standstill else 0,
       "AccWarn_D_Dsply": 0,                                       # ACC warning
-      "AccTGap_D_Dsply": gac_tr_cluster,                          # Fixed time gap in UI
+      "AccTGap_D_Dsply": 4,                                       # Fixed time gap in UI
     })
 
   # Forwards FCW alert from IPMA
