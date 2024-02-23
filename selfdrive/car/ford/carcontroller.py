@@ -182,7 +182,7 @@ class CarController:
         targetSpeed = hud_control.setSpeed
 
       precharge_actuate, brake_actuate = actuators_calc(self, accel)
-            brake = accel
+      brake = accel
       if brake < 0 :
         brake_clip = self.brake_actutator_target - self.brake_actutator_stdDevLow
         brake = interp(accel, [ CarControllerParams.ACCEL_MIN, self.brake_converge_at, brake_clip], [CarControllerParams.ACCEL_MIN, self.brake_converge_at, self.brake_0_point])
